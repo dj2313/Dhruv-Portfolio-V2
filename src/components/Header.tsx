@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, User, Mail, Download, Home } from 'lucide-react';
+import { Menu, X, User, Mail, Download, Home, Briefcase } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import cvPdf from '../Dhruv CV.pdf';
 
 const Header = () => {
@@ -43,10 +44,20 @@ const Header = () => {
   };
 
   const navItems = [
-    { name: 'Home', href: '#home', icon: Home },
+    { name: 'Home', href: '/', icon: Home },
     { name: 'About', href: '#about', icon: User },
+    { name: 'Projects', href: '/projects', icon: Briefcase, external: true },
     { name: 'Contact', href: '#contact', icon: Mail },
   ];
+
+  // Update the navigation links to handle both hash and path navigation
+  const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith('#')) {
+      e.preventDefault();
+      const element = document.querySelector(href);
+      element?.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
@@ -69,10 +80,11 @@ const Header = () => {
               const Icon = item.icon;
               const isActive = activeSection === item.href.substring(1);
               
-              return (
+              return item.href.startsWith('#') ? (
                 <a
                   key={item.name}
                   href={item.href}
+                  onClick={(e) => handleNavigation(e, item.href)}
                   className={`relative px-4 py-2 font-light transition-all duration-300 flex items-center space-x-2 group ${
                     isActive
                       ? 'text-white'
@@ -84,6 +96,17 @@ const Header = () => {
                   {isActive && (
                     <span className="absolute -bottom-1 left-0 w-full h-px bg-gradient-to-r from-cyan-500 to-transparent" />
                   )}
+                </a>
+              ) : (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="relative px-4 py-2 font-light transition-all duration-300 flex items-center space-x-2 group text-gray-400 hover:text-white"
+                >
+                  <Icon className="w-4 h-4" />
+                  <span className="tracking-wider">{item.name}</span>
                 </a>
               );
             })}

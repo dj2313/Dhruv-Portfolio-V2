@@ -1,6 +1,7 @@
 {
   "version": 2,
-  "buildCommand": "npm ci --no-optional && npm run build",
+  "buildCommand": "npm ci --omit=optional && npm run build",
+  "installCommand": "npm ci --omit=optional",
   "outputDirectory": "dist",
   "framework": "vite",
   "rewrites": [

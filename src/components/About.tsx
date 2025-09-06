@@ -238,7 +238,7 @@ const About: React.FC = () => {
                       <span className="font-medium">GitHub</span>
                     </a>
                     <a
-                      href="https://www.linkedin.com/in/dhruv-trivedi-357634229"
+                      href="https://www.linkedin.com/in/trivedi-dhruv/"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="group flex items-center space-x-3 px-6 py-3 bg-blue-600/20 backdrop-blur-sm rounded-xl border border-blue-500/30 text-white hover:bg-blue-600/30 hover:border-blue-400/50 transition-all duration-300 transform hover:scale-105"
