@@ -125,7 +125,7 @@ const Hero: React.FC = () => {
               </a>
               
               <a
-                href="https://www.linkedin.com/in/dhruv-trivedi-357634229"
+                href="https://www.linkedin.com/in/trivedi-dhruv127/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-12 h-12 flex items-center justify-center rounded-full border border-white/10 

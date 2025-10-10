@@ -23,7 +23,7 @@ const Footer = () => {
 
   const socialLinks = [
     { icon: Github, href: "https://github.com/dj2313", label: "GitHub", color: "hover:bg-gray-700 hover:text-white" },
-    { icon: Linkedin, href: "https://www.linkedin.com/in/dhruv-trivedi-357634229", label: "LinkedIn", color: "hover:bg-blue-600 hover:text-white" }
+    { icon: Linkedin, href: "https://www.linkedin.com/in/trivedi-dhruv127/", label: "LinkedIn", color: "hover:bg-blue-600 hover:text-white" }
   ];
 
 

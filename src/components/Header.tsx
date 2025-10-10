@@ -1,38 +1,29 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, User, Mail, Download, Home, Briefcase } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Menu, X, ChevronRight } from 'lucide-react';
+import { Link as ScrollLink } from 'react-scroll';
+import { Link as RouterLink } from 'react-router-dom';
 import cvPdf from '../Dhruv CV.pdf';
+import { cn } from '../lib/utils';
 
-const Header = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const [activeSection, setActiveSection] = useState('home');
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
-      
-      // Update active section based on scroll position
-      const sections = ['home', 'about', 'contact'];
-      const scrollPosition = window.scrollY + 100;
-      
-      for (const section of sections) {
-        const element = document.getElementById(section);
-        if (element) {
-          const offsetTop = element.offsetTop;
-          const offsetHeight = element.offsetHeight;
-          
-          if (scrollPosition >= offsetTop && scrollPosition < offsetTop + offsetHeight) {
-            setActiveSection(section);
-            break;
-          }
-        }
-      }
     };
-    
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
+
+  const navItems = [
+    { name: 'Home', to: 'home', isScroll: true },
+    { name: 'About', to: 'about', isScroll: true },
+    { name: 'Projects', to: '/projects', isScroll: false },
+    { name: 'Contact', to: 'contact', isScroll: true }
+  ];
 
   const handleDownloadCV = () => {
     const link = document.createElement('a');
@@ -43,145 +34,140 @@ const Header = () => {
     document.body.removeChild(link);
   };
 
-  const navItems = [
-    { name: 'Home', href: '/', icon: Home },
-    { name: 'About', href: '#about', icon: User },
-    { name: 'Projects', href: '/projects', icon: Briefcase, external: true },
-    { name: 'Contact', href: '#contact', icon: Mail },
-  ];
-
-  // Update the navigation links to handle both hash and path navigation
-  const handleNavigation = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (href.startsWith('#')) {
-      e.preventDefault();
-      const element = document.querySelector(href);
-      element?.scrollIntoView({ behavior: 'smooth' });
+  const renderNavLink = (item: { name: string; to: string; isScroll: boolean }) => {
+    if (item.isScroll) {
+      return (
+        <ScrollLink
+          to={item.to}
+          smooth={true}
+          spy={true}
+          offset={-70}
+          className={cn(
+            "text-gray-300 hover:text-white transition-colors cursor-pointer",
+            isScrolled ? "text-sm" : "text-base",
+            "hover:text-cyan-400"
+          )}
+          activeClass="text-cyan-400"
+          onClick={() => setIsOpen(false)}
+        >
+          {item.name}
+        </ScrollLink>
+      );
     }
+
+    return (
+      <RouterLink
+        to={item.to}
+        className={cn(
+          "text-gray-300 hover:text-white transition-colors cursor-pointer",
+          isScrolled ? "text-sm" : "text-base",
+          "hover:text-cyan-400"
+        )}
+        onClick={() => setIsOpen(false)}
+      >
+        {item.name}
+      </RouterLink>
+    );
   };
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-      isScrolled 
-        ? 'bg-[#0a0a0a]/95 backdrop-blur-xl border-b border-white/5' 
-        : 'bg-transparent'
-    }`}>
-      <nav className="container mx-auto px-6 py-4">
-        <div className="flex items-center justify-between">
-          {/* Logo/Name */}
-          <div className="flex items-center">
-            <span className="text-xl font-light text-white tracking-wider hover:text-cyan-400 transition-colors duration-300">
-              Dhruv Trivedi
-            </span>
-          </div>
+    <header 
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+        isScrolled 
+          ? "py-2 bg-black/80 backdrop-blur-md border-b border-white/10" 
+          : "py-4 bg-transparent"
+      )}
+    >
+      <nav className="container mx-auto px-6">
+        <div className={cn(
+          "flex items-center justify-between transition-all duration-300",
+          isScrolled ? "rounded-full border border-white/10 bg-black/50 backdrop-blur-lg px-6 py-3" : ""
+        )}>
+          {/* Logo */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center"
+          >
+            <ScrollLink
+              to="home"
+              smooth={true}
+              className={cn(
+                "text-white font-bold cursor-pointer transition-all duration-300",
+                isScrolled ? "text-xl" : "text-2xl"
+              )}
+            >
+              Portfolio<span className="text-cyan-400">.</span>
+            </ScrollLink>
+          </motion.div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeSection === item.href.substring(1);
-              
-              return item.href.startsWith('#') ? (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  onClick={(e) => handleNavigation(e, item.href)}
-                  className={`relative px-4 py-2 font-light transition-all duration-300 flex items-center space-x-2 group ${
-                    isActive
-                      ? 'text-white'
-                      : 'text-gray-400 hover:text-white'
-                  }`}
-                >
-                  <Icon className="w-4 h-4" />
-                  <span className="tracking-wider">{item.name}</span>
-                  {isActive && (
-                    <span className="absolute -bottom-1 left-0 w-full h-px bg-gradient-to-r from-cyan-500 to-transparent" />
-                  )}
-                </a>
-              ) : (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="relative px-4 py-2 font-light transition-all duration-300 flex items-center space-x-2 group text-gray-400 hover:text-white"
-                >
-                  <Icon className="w-4 h-4" />
-                  <span className="tracking-wider">{item.name}</span>
-                </a>
-              );
-            })}
-            
-            {/* Download CV Button */}
-            <button
+            {navItems.map((item) => (
+              <div key={item.name}>
+                {renderNavLink(item)}
+              </div>
+            ))}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={handleDownloadCV}
-              className="px-6 py-2 text-sm text-white border border-white/10 rounded-full font-light 
-                       hover:bg-white/5 transition-all duration-300 flex items-center space-x-2"
+              className={cn(
+                "px-6 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-xl",
+                "text-white flex items-center space-x-2 hover:opacity-90 transition-all",
+                isScrolled ? "text-sm px-4 py-1.5" : "text-base"
+              )}
             >
-              <Download className="w-4 h-4" />
-              <span className="tracking-wider">CV</span>
-            </button>
+              <span>Resume</span>
+              <ChevronRight className="w-4 h-4" />
+            </motion.button>
           </div>
 
           {/* Mobile Menu Button */}
-          <button
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="md:hidden p-2 text-white/80 hover:text-white transition-colors duration-300"
+          <motion.button
+            whileTap={{ scale: 0.95 }}
+            className="md:hidden text-white p-2"
+            onClick={() => setIsOpen(!isOpen)}
           >
-            {isMenuOpen ? (
-              <X className="w-6 h-6" />
-            ) : (
-              <Menu className="w-6 h-6" />
-            )}
-          </button>
+            {isOpen ? <X /> : <Menu />}
+          </motion.button>
         </div>
 
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 mt-2 mx-4 p-4 bg-[#0a0a0a]/95 backdrop-blur-xl rounded-lg border border-white/5">
-            <div className="space-y-3">
-              {navItems.map((item) => {
-                const Icon = item.icon;
-                const isActive = activeSection === item.href.substring(1);
-                
-                return (
-                  <a
-                    key={item.name}
-                    href={item.href}
-                    onClick={() => setIsMenuOpen(false)}
-                    className={`flex items-center space-x-3 p-3 rounded-lg font-light transition-all duration-300 ${
-                      isActive
-                        ? 'text-white bg-white/5'
-                        : 'text-gray-400 hover:text-white hover:bg-white/5'
-                    }`}
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.2 }}
+              className="md:hidden absolute top-full left-4 right-4 mt-2"
+            >
+              <div className="bg-black/90 backdrop-blur-xl rounded-2xl border border-white/10 p-6 shadow-lg">
+                <div className="flex flex-col space-y-4">
+                  {navItems.map((item) => (
+                    <div key={item.name}>
+                      {renderNavLink(item)}
+                    </div>
+                  ))}
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => {
+                      handleDownloadCV();
+                      setIsOpen(false);
+                    }}
+                    className="w-full px-6 py-2 bg-gradient-to-r from-cyan-500 to-purple-600 rounded-xl text-white flex items-center justify-center space-x-2"
                   >
-                    <Icon className="w-4 h-4" />
-                    <span className="tracking-wider">{item.name}</span>
-                  </a>
-                );
-              })}
-              
-              <button
-                onClick={() => {
-                  handleDownloadCV();
-                  setIsMenuOpen(false);
-                }}
-                className="w-full mt-4 p-3 text-white/80 border border-white/10 rounded-lg font-light 
-                         hover:bg-white/5 transition-all duration-300 flex items-center justify-center space-x-2"
-              >
-                <Download className="w-4 h-4" />
-                <span className="tracking-wider">Download CV</span>
-              </button>
-            </div>
-          </div>
-        )}
+                    <span>Resume</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </motion.button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
-      
-      {/* Progress Bar */}
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-cyan-500 to-transparent transform origin-left scale-x-0 transition-transform duration-300" 
-           style={{ 
-             transform: `scaleX(${Math.min(window.scrollY / (document.documentElement.scrollHeight - window.innerHeight), 1)})` 
-           }} 
-      />
     </header>
   );
 };
